@@ -1,0 +1,8 @@
+name: Fahrenheit
+version: ${version}
+main: com.aguadelamiseria.fahrenheit.Fahrenheit
+dependencies: [Vault, PlaceholderAPI]
+
+commands:
+  rankup:
+    description: "Main command"

@@ -1,0 +1,10 @@
+default-rank:
+  id: "default"
+  name: "Default"
+  tag: "[Default]"
+
+messages:
+  rankup:
+    success: "&aRanked up successfully!"
+    not-next: "&cNo more ranks to rankup"
+    fail: "&cNot enough money!"

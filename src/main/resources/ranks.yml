@@ -1,0 +1,13 @@
+ranks:
+  basic-rank:
+    name: "Basic"
+    cost: 100
+    tag: "&c[Basic]"
+    commands:
+      - "lp user %player% permission add my.special.permission"
+  medium-rank:
+    name: "Medium"
+    cost: 300
+    tag: "&c[Medium]"
+    commands:
+      - "lp user %player% permission add my.amazing.permission"
