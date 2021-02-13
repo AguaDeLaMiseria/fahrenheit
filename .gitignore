@@ -8,3 +8,4 @@
 .settings/
 .project
 .factorypath
+dependency-reduced-pom.xml
