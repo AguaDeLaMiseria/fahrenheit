@@ -1,10 +1,8 @@
 package com.aguadelamiseria.fahrenheit.rank;
 
 import com.aguadelamiseria.fahrenheit.api.FahrenheitApi;
-import com.aguadelamiseria.fahrenheit.rank.Rank;
-import com.aguadelamiseria.fahrenheit.rank.RankImpl;
+import com.aguadelamiseria.fahrenheit.api.events.PlayerRankupEvent;
 import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -48,7 +46,7 @@ public class RankManager implements Listener, FahrenheitApi {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event){
-        ranks.forEach(rank -> rank.getPlayers().remove(event.getPlayer()));
+        ranks.forEach(rank -> rank.getPlayers().remove(event.getPlayer())); // Just to be on the safe side
     }
 
     public void handleJoin(Player player){
@@ -66,9 +64,15 @@ public class RankManager implements Listener, FahrenheitApi {
         Rank current = getPlayerRank(player);
         int cost = next.getCost();
 
-        EconomyResponse response = economy.withdrawPlayer(Bukkit.getOfflinePlayer(player.getUniqueId()), cost);
-        if (!response.transactionSuccess()) return Response.FAIL;
+        if (!economy.has(Bukkit.getOfflinePlayer(player.getUniqueId()), cost)) return Response.FAIL;
 
+        PlayerRankupEvent rankupEvent = new PlayerRankupEvent(player, current, next);
+        Bukkit.getPluginManager().callEvent(rankupEvent);
+
+        if (rankupEvent.isCancelled()) return Response.NOT_NEXT;
+        if (next != rankupEvent.getNewRank()) next = rankupEvent.getNewRank();
+
+        economy.withdrawPlayer(Bukkit.getOfflinePlayer(player.getUniqueId()), cost);
         current.getPlayers().remove(player);
         next.getPlayers().add(player);
         permission.playerRemove(null, player, current.getPermission());
@@ -126,6 +130,41 @@ public class RankManager implements Listener, FahrenheitApi {
     @Override
     public Set<Rank> getRanks() {
         return ranks;
+    }
+
+    @Override
+    public void setRank(@NotNull Player player, @NotNull Rank newRank) {
+        setRank(player, newRank, false, false);
+    }
+
+    @Override
+    public void setRank(@NotNull Player player, @NotNull Rank newRank, boolean reward) {
+        setRank(player, newRank, reward, false);
+    }
+
+    @Override
+    public void setRank(@NotNull Player player, @NotNull Rank newRank, boolean reward, boolean charged) {
+        Objects.requireNonNull(player);
+        Objects.requireNonNull(newRank);
+
+        Rank current = getPlayerRank(player);
+
+        PlayerRankupEvent rankupEvent = new PlayerRankupEvent(player, current, newRank);
+        Bukkit.getPluginManager().callEvent(rankupEvent);
+
+        if (rankupEvent.isCancelled()) return;
+        if (newRank != rankupEvent.getNewRank()) newRank = rankupEvent.getNewRank();
+
+        if (charged){
+            int cost = newRank.getCost();
+            economy.withdrawPlayer(Bukkit.getOfflinePlayer(player.getUniqueId()), cost);
+        }
+
+        current.getPlayers().remove(player);
+        newRank.getPlayers().add(player);
+        permission.playerRemove(null, player, current.getPermission());
+        permission.playerAdd(null, player, newRank.getPermission());
+        if (reward) newRank.reward(player);
     }
 
     public enum Response {

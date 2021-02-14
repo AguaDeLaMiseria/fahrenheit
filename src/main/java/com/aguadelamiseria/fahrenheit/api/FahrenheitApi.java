@@ -10,7 +10,7 @@ import java.util.Set;
 
 /**
  * Represents the interface for Fahrenheit providing useful methods for add-on development
- * @version 1.0.0
+ * @version 1.1.0
  * @see Rank
  */
 public interface FahrenheitApi {
@@ -38,4 +38,29 @@ public interface FahrenheitApi {
      * @return A Set containing all existing {@link Rank}s including {@link DefaultRank}}
      */
     Set<Rank> getRanks();
+
+    /**
+     * Changes the rank of the player to a new one without cost and without rewarding
+     * @param player The player who will have his rank changed
+     * @param newRank Thew new rank the player will have
+     */
+    void setRank(@NotNull Player player, @NotNull Rank newRank);
+
+    /**
+     * Changes the rank of the player to a new one without cost, optionally rewarded
+     * @param player The player who will have his rank changed
+     * @param newRank Thew new rank the player will have
+     * @param reward Whether the player will be rewarded or not
+     */
+    void setRank(@NotNull Player player, @NotNull Rank newRank, boolean reward);
+
+    /**
+     * Changes the rank of the player to a new one, optionally rewarded and optionally charged.
+     * If the player has not enough money, it will not be charged, so make sure of this first.
+     * @param player The player who will have his rank changed
+     * @param newRank Thew new rank the player will have
+     * @param reward Whether the player will be rewarded or not
+     * @param charged Whether money will be withdrawn from the player or not
+     */
+    void setRank(@NotNull Player player, @NotNull Rank newRank, boolean reward, boolean charged);
 }
