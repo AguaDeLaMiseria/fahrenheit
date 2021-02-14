@@ -2,8 +2,7 @@ package com.aguadelamiseria.fahrenheit;
 
 import com.aguadelamiseria.fahrenheit.modules.CoreModule;
 import com.aguadelamiseria.fahrenheit.service.Service;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import me.yushust.inject.Injector;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.inject.Inject;
@@ -21,7 +20,7 @@ public class Fahrenheit extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        Injector injector = Guice.createInjector(new CoreModule(this));
+        Injector injector = Injector.create(new CoreModule(this));
         injector.injectMembers(this);
         coreService.start();
     }

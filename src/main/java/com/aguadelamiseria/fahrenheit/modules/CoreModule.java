@@ -9,9 +9,8 @@ import com.aguadelamiseria.fahrenheit.rank.RankManager;
 import com.aguadelamiseria.fahrenheit.service.Service;
 import com.aguadelamiseria.fahrenheit.services.CoreService;
 import com.aguadelamiseria.fahrenheit.utils.MessageUtils;
-import com.google.inject.Binder;
-import com.google.inject.Module;
-import com.google.inject.name.Names;
+import me.yushust.inject.Binder;
+import me.yushust.inject.Module;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -32,7 +31,7 @@ public class CoreModule implements Module {
         binder.bind(Fahrenheit.class).toInstance(fahrenheit);
         binder.bind(JavaPlugin.class).toInstance(fahrenheit);
 
-        binder.bind(Service.class).annotatedWith(Names.named("core-service")).to(CoreService.class).asEagerSingleton();
+        binder.bind(Service.class).named("core-service").to(CoreService.class).singleton();
 
         binder.bind(Economy.class).toProvider(() -> {
             ServicesManager manager = fahrenheit.getServer().getServicesManager();
@@ -56,18 +55,16 @@ public class CoreModule implements Module {
             return rspPe.getProvider();
         });
 
-        binder.bind(ConfigurationFile.class)
-                .annotatedWith(Names.named("config"))
+        binder.bind(ConfigurationFile.class).named("config")
                 .toInstance(new ConfigurationFile(fahrenheit, "config.yml"));
 
-        binder.bind(ConfigurationFile.class)
-                .annotatedWith(Names.named("ranks"))
+        binder.bind(ConfigurationFile.class).named("ranks")
                 .toInstance(new ConfigurationFile(fahrenheit, "ranks.yml"));
 
-        binder.bind(MessageUtils.class).asEagerSingleton();
-        binder.bind(PlaceholderHook.class).asEagerSingleton();
+        binder.bind(MessageUtils.class).singleton();
+        binder.bind(PlaceholderHook.class).singleton();
 
-        binder.bind(Rank.class).annotatedWith(Names.named("default")).to(DefaultRank.class).asEagerSingleton();
-        binder.bind(RankManager.class).asEagerSingleton();
+        binder.bind(Rank.class).named("default").to(DefaultRank.class).singleton();
+        binder.bind(RankManager.class).singleton();
     }
 }
